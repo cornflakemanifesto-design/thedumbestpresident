@@ -1,22 +1,25 @@
-import { getJSON, putJSON } from "./redis-store";
+import { getRedisClient } from "./redis-store";
 
-const VOTES_PATH = "data/votes.json";
-
-export type VoteCounts = Record<string, Record<string, number>>;
-
-export async function readVotes(): Promise<VoteCounts> {
-  return getJSON<VoteCounts>(VOTES_PATH, {});
+function voteKey(pollId: string): string {
+  return `votes:${pollId}`;
 }
 
-export async function incrementVote(pollId: string, optionId: string) {
-  const votes = await readVotes();
-  votes[pollId] ??= {};
-  votes[pollId][optionId] = (votes[pollId][optionId] ?? 0) + 1;
-  await putJSON(VOTES_PATH, votes);
+export async function getPollVotes(pollId: string): Promise<Record<string, number>> {
+  const client = await getRedisClient();
+  const raw = await client.hGetAll(voteKey(pollId));
+  const counts: Record<string, number> = {};
+  for (const [optionId, value] of Object.entries(raw)) {
+    counts[optionId] = Number(value);
+  }
+  return counts;
 }
 
-export async function resetPollVotes(pollId: string) {
-  const votes = await readVotes();
-  delete votes[pollId];
-  await putJSON(VOTES_PATH, votes);
+export async function incrementVote(pollId: string, optionId: string): Promise<void> {
+  const client = await getRedisClient();
+  await client.hIncrBy(voteKey(pollId), optionId, 1);
+}
+
+export async function resetPollVotes(pollId: string): Promise<void> {
+  const client = await getRedisClient();
+  await client.del(voteKey(pollId));
 }

@@ -1,5 +1,5 @@
 import { getJSON, putJSON } from "./redis-store";
-import { readVotes, resetPollVotes } from "./votes-store";
+import { getPollVotes, resetPollVotes } from "./votes-store";
 
 export type PollOption = {
   id: string;
@@ -48,14 +48,16 @@ export async function deletePollDefinition(id: string): Promise<void> {
 }
 
 export async function getPollsWithResults(): Promise<PollWithResults[]> {
-  const [polls, votes] = await Promise.all([getPollDefinitions(), readVotes()]);
+  const polls = await getPollDefinitions();
 
-  return polls.map((poll) => {
-    const counts = votes[poll.id] ?? {};
-    const total = poll.options.reduce(
-      (sum, option) => sum + (counts[option.id] ?? 0),
-      0
-    );
-    return { ...poll, counts, total };
-  });
+  return Promise.all(
+    polls.map(async (poll) => {
+      const counts = await getPollVotes(poll.id);
+      const total = poll.options.reduce(
+        (sum, option) => sum + (counts[option.id] ?? 0),
+        0
+      );
+      return { ...poll, counts, total };
+    })
+  );
 }
