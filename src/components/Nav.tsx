@@ -1,23 +1,24 @@
 import Link from "next/link";
+import type { SiteCopy } from "@/lib/site-copy";
 
-const LINKS = [
-  { href: "/writings", label: "Writings" },
-  { href: "/gallery", label: "Gallery" },
-  { href: "/roast", label: "The Roast" },
-  { href: "/polls", label: "Polls" },
-];
+export function Nav({ copy }: { copy: SiteCopy }) {
+  const links = [
+    { href: "/writings", label: copy["nav.writings"] },
+    { href: "/gallery", label: copy["nav.gallery"] },
+    { href: "/roast", label: copy["nav.roast"] },
+    { href: "/polls", label: copy["nav.polls"] },
+  ];
 
-export function Nav() {
   return (
     <header className="border-b border-white/10 bg-neutral-950">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-4">
         <Link href="/" className="flex items-baseline gap-2">
           <span className="text-xl font-black tracking-tight text-orange-500">
-            The Dumbest President
+            {copy["site.title"]}
           </span>
         </Link>
         <nav className="flex flex-wrap gap-1 text-sm font-medium">
-          {LINKS.map((link) => (
+          {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}

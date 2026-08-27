@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
+import { getSiteCopy } from "@/lib/site-copy";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,25 +15,31 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "The Dumbest President",
-    template: "%s — The Dumbest President",
-  },
-  description:
-    "A running, always-evolving exhibition of the dumbest moments of the Trump presidencies.",
-};
+export const dynamic = "force-dynamic";
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export async function generateMetadata(): Promise<Metadata> {
+  const copy = await getSiteCopy();
+  return {
+    title: {
+      default: copy["site.title"],
+      template: `%s — ${copy["site.title"]}`,
+    },
+    description: copy["site.metaDescription"],
+  };
+}
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const copy = await getSiteCopy();
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-neutral-950 text-neutral-100">
-        <Nav />
+        <Nav copy={copy} />
         <main className="flex-1">{children}</main>
-        <Footer />
+        <Footer copy={copy} />
       </body>
     </html>
   );

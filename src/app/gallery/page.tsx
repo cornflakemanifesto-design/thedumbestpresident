@@ -1,19 +1,20 @@
-import type { Metadata } from "next";
 import { getGalleryItems } from "@/lib/gallery";
+import { getSiteCopy } from "@/lib/site-copy";
 
-export const metadata: Metadata = {
-  title: "Gallery",
-};
+export async function generateMetadata() {
+  const copy = await getSiteCopy();
+  return { title: copy["gallery.heading"] };
+}
 
 export default async function GalleryPage() {
-  const items = await getGalleryItems();
+  const [items, copy] = await Promise.all([getGalleryItems(), getSiteCopy()]);
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-16">
-      <h1 className="text-3xl font-black tracking-tight text-white">Gallery</h1>
-      <p className="mt-2 text-neutral-400">
-        Photos of Donald Trump looking, saying, or doing something dumb.
-      </p>
+      <h1 className="text-3xl font-black tracking-tight text-white">
+        {copy["gallery.heading"]}
+      </h1>
+      <p className="mt-2 text-neutral-400">{copy["gallery.description"]}</p>
 
       <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (
@@ -38,6 +39,9 @@ export default async function GalleryPage() {
             </div>
           </a>
         ))}
+        {items.length === 0 && (
+          <p className="text-neutral-500">Nothing here yet.</p>
+        )}
       </div>
     </div>
   );

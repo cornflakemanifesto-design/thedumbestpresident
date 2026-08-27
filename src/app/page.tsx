@@ -1,50 +1,47 @@
 import Link from "next/link";
 import { getAllWritings } from "@/lib/writings";
-
-const SECTIONS = [
-  {
-    href: "/writings",
-    title: "Writings",
-    description: "Essays and running commentary on the current state of things.",
-  },
-  {
-    href: "/gallery",
-    title: "Gallery",
-    description: "Photos of Donald Trump looking, saying, or doing something dumb.",
-  },
-  {
-    href: "/roast",
-    title: "The Roast",
-    description: "Video clips with running commentary, MST3K-style.",
-  },
-  {
-    href: "/polls",
-    title: "Polls",
-    description: "Vote on the dumbest moments, and settle who's dumber than who.",
-  },
-];
+import { getSiteCopy } from "@/lib/site-copy";
 
 export default async function Home() {
-  const writings = await getAllWritings();
+  const [writings, copy] = await Promise.all([getAllWritings(), getSiteCopy()]);
   const latest = writings[0];
+
+  const sections = [
+    {
+      href: "/writings",
+      title: copy["home.section.writings.title"],
+      description: copy["home.section.writings.description"],
+    },
+    {
+      href: "/gallery",
+      title: copy["home.section.gallery.title"],
+      description: copy["home.section.gallery.description"],
+    },
+    {
+      href: "/roast",
+      title: copy["home.section.roast.title"],
+      description: copy["home.section.roast.description"],
+    },
+    {
+      href: "/polls",
+      title: copy["home.section.polls.title"],
+      description: copy["home.section.polls.description"],
+    },
+  ];
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-16">
       <section className="max-w-2xl">
         <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
-          The Dumbest President
+          {copy["site.title"]}
         </h1>
-        <p className="mt-4 text-lg text-neutral-300">
-          A running, always-evolving exhibition of the Trump presidencies —
-          the dumbest chapter in American political history, documented in
-          real time.
-        </p>
+        <p className="mt-4 text-lg text-neutral-300">{copy["site.tagline"]}</p>
       </section>
 
       {latest && (
         <section className="mt-12 rounded-2xl border border-white/10 bg-neutral-900 p-6">
           <p className="text-xs font-semibold uppercase tracking-wide text-orange-500">
-            Latest writing
+            {copy["home.latestWritingLabel"]}
           </p>
           <h2 className="mt-2 text-xl font-bold text-white">
             <Link href={`/writings/${latest.slug}`} className="hover:underline">
@@ -56,7 +53,7 @@ export default async function Home() {
       )}
 
       <section className="mt-12 grid gap-4 sm:grid-cols-2">
-        {SECTIONS.map((section) => (
+        {sections.map((section) => (
           <Link
             key={section.href}
             href={section.href}

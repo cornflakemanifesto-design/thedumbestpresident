@@ -1,6 +1,5 @@
-import fs from "node:fs/promises";
-import path from "node:path";
-import { readVotes } from "./votes-store";
+import { getJSON, putJSON } from "./redis-store";
+import { readVotes, resetPollVotes } from "./votes-store";
 
 export type PollOption = {
   id: string;
@@ -18,11 +17,34 @@ export type PollWithResults = PollDefinition & {
   total: number;
 };
 
-const POLLS_FILE = path.join(process.cwd(), "content", "polls.json");
+const POLLS_PATH = "data/polls.json";
 
 export async function getPollDefinitions(): Promise<PollDefinition[]> {
-  const raw = await fs.readFile(POLLS_FILE, "utf8");
-  return JSON.parse(raw) as PollDefinition[];
+  return getJSON<PollDefinition[]>(POLLS_PATH, []);
+}
+
+export async function getPollDefinition(
+  id: string
+): Promise<PollDefinition | null> {
+  const polls = await getPollDefinitions();
+  return polls.find((p) => p.id === id) ?? null;
+}
+
+export async function savePollDefinition(poll: PollDefinition): Promise<void> {
+  const polls = await getPollDefinitions();
+  const idx = polls.findIndex((p) => p.id === poll.id);
+  if (idx >= 0) polls[idx] = poll;
+  else polls.push(poll);
+  await putJSON(POLLS_PATH, polls);
+}
+
+export async function deletePollDefinition(id: string): Promise<void> {
+  const polls = await getPollDefinitions();
+  await putJSON(
+    POLLS_PATH,
+    polls.filter((p) => p.id !== id)
+  );
+  await resetPollVotes(id);
 }
 
 export async function getPollsWithResults(): Promise<PollWithResults[]> {

@@ -1,60 +1,44 @@
-import fs from "node:fs/promises";
-import path from "node:path";
-import matter from "gray-matter";
 import readingTime from "reading-time";
+import { getJSON, putJSON } from "./redis-store";
+export { slugify } from "./slug";
 
-const WRITINGS_DIR = path.join(process.cwd(), "content", "writings");
+const WRITINGS_PATH = "data/writings.json";
 
-export type WritingFrontmatter = {
+export type Writing = {
+  slug: string;
   title: string;
   date: string;
   excerpt: string;
-  tags?: string[];
+  tags: string[];
+  body: string;
 };
 
-export type WritingSummary = WritingFrontmatter & {
-  slug: string;
-  readingTime: string;
-};
-
-async function readSlugs() {
-  const files = await fs.readdir(WRITINGS_DIR);
-  return files
-    .filter((file) => file.endsWith(".mdx"))
-    .map((file) => file.replace(/\.mdx$/, ""));
+export async function getAllWritings(): Promise<Writing[]> {
+  const writings = await getJSON<Writing[]>(WRITINGS_PATH, []);
+  return [...writings].sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-export async function getAllWritings(): Promise<WritingSummary[]> {
-  const slugs = await readSlugs();
+export async function getWriting(slug: string): Promise<Writing | null> {
+  const writings = await getJSON<Writing[]>(WRITINGS_PATH, []);
+  return writings.find((w) => w.slug === slug) ?? null;
+}
 
-  const writings = await Promise.all(
-    slugs.map(async (slug) => {
-      const raw = await fs.readFile(
-        path.join(WRITINGS_DIR, `${slug}.mdx`),
-        "utf8"
-      );
-      const { data, content } = matter(raw);
-      const frontmatter = data as WritingFrontmatter;
+export function readingTimeFor(body: string): string {
+  return readingTime(body).text;
+}
 
-      return {
-        ...frontmatter,
-        slug,
-        readingTime: readingTime(content).text,
-      };
-    })
+export async function saveWriting(writing: Writing): Promise<void> {
+  const writings = await getJSON<Writing[]>(WRITINGS_PATH, []);
+  const idx = writings.findIndex((w) => w.slug === writing.slug);
+  if (idx >= 0) writings[idx] = writing;
+  else writings.push(writing);
+  await putJSON(WRITINGS_PATH, writings);
+}
+
+export async function deleteWriting(slug: string): Promise<void> {
+  const writings = await getJSON<Writing[]>(WRITINGS_PATH, []);
+  await putJSON(
+    WRITINGS_PATH,
+    writings.filter((w) => w.slug !== slug)
   );
-
-  return writings.sort((a, b) => (a.date < b.date ? 1 : -1));
-}
-
-export async function getWritingSource(slug: string) {
-  const raw = await fs.readFile(
-    path.join(WRITINGS_DIR, `${slug}.mdx`),
-    "utf8"
-  );
-  return raw;
-}
-
-export async function getWritingSlugs() {
-  return readSlugs();
 }

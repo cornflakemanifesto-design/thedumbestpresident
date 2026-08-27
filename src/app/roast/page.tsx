@@ -1,19 +1,20 @@
-import type { Metadata } from "next";
 import { getRoastVideos } from "@/lib/videos";
+import { getSiteCopy } from "@/lib/site-copy";
 
-export const metadata: Metadata = {
-  title: "The Roast",
-};
+export async function generateMetadata() {
+  const copy = await getSiteCopy();
+  return { title: copy["roast.heading"] };
+}
 
 export default async function RoastPage() {
-  const videos = await getRoastVideos();
+  const [videos, copy] = await Promise.all([getRoastVideos(), getSiteCopy()]);
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="text-3xl font-black tracking-tight text-white">The Roast</h1>
-      <p className="mt-2 text-neutral-400">
-        Video clips with running commentary, MST3K-style.
-      </p>
+      <h1 className="text-3xl font-black tracking-tight text-white">
+        {copy["roast.heading"]}
+      </h1>
+      <p className="mt-2 text-neutral-400">{copy["roast.description"]}</p>
 
       <div className="mt-10 flex flex-col gap-12">
         {videos.map((video) => (
@@ -32,7 +33,7 @@ export default async function RoastPage() {
               </div>
             ) : (
               <div className="mt-3 flex aspect-video items-center justify-center rounded-2xl border border-dashed border-white/20 bg-neutral-900 text-sm text-neutral-500">
-                Add a youtubeId in content/videos.json
+                No video linked yet
               </div>
             )}
 
@@ -45,6 +46,9 @@ export default async function RoastPage() {
             </ul>
           </div>
         ))}
+        {videos.length === 0 && (
+          <p className="text-neutral-500">Nothing here yet.</p>
+        )}
       </div>
     </div>
   );
