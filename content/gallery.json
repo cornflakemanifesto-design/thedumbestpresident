@@ -1,0 +1,23 @@
+[
+  {
+    "id": "fist-pump",
+    "src": "/gallery/trump-fist-pump.jpg",
+    "caption": "The full-body fist pump, deployed with the confidence of a man who has never once questioned himself.",
+    "credit": "Official White House Photo by Amy Rossetti (public domain)",
+    "date": "2018-10-06"
+  },
+  {
+    "id": "g20-point",
+    "src": "/gallery/trump-point-g20.jpg",
+    "caption": "Pointing at a reporter like it's their fault the question was hard. G20 Osaka Summit.",
+    "credit": "Official White House Photo by Dan Scavino (public domain)",
+    "date": "2019-06-29"
+  },
+  {
+    "id": "oval-office-desk",
+    "src": "/gallery/trump-oval-office-desk.jpg",
+    "caption": "A very serious man at a very serious desk, doing very serious paperwork.",
+    "credit": "Official White House Photo by Shealah Craighead (public domain)",
+    "date": "2018-12-21"
+  }
+]
