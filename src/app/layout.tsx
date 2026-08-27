@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Alfa_Slab_One, Poppins } from "next/font/google";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { getSiteCopy } from "@/lib/site-copy";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const displayFont = Alfa_Slab_One({
+  weight: "400",
   subsets: ["latin"],
+  variable: "--font-display",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const bodyFont = Poppins({
+  weight: ["400", "600", "700"],
   subsets: ["latin"],
+  variable: "--font-body",
 });
 
 export const dynamic = "force-dynamic";
@@ -34,9 +36,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${displayFont.variable} ${bodyFont.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-neutral-950 text-neutral-100">
+      <body className="flex min-h-full flex-col font-sans">
         <Nav copy={copy} />
         <main className="flex-1">{children}</main>
         <Footer copy={copy} />

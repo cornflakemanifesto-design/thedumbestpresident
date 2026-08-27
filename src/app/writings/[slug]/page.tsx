@@ -21,10 +21,10 @@ export default async function WritingPage(props: PageProps<"/writings/[slug]">) 
 
   return (
     <article className="mx-auto max-w-3xl px-6 py-16">
-      <p className="text-xs font-semibold uppercase tracking-wide text-orange-500">
+      <p className="text-xs font-bold tracking-[0.2em] text-marquee-red uppercase">
         {writing.date}
       </p>
-      <h1 className="mt-2 text-3xl font-black tracking-tight text-white">
+      <h1 className="mt-2 font-display text-3xl tracking-wide text-mustard">
         {writing.title}
       </h1>
       <div className="prose-writing mt-8">{content}</div>

@@ -11,8 +11,8 @@ export function PollCard({
   const hasVoted = Boolean(votedOptionId);
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-neutral-900 p-6">
-      <h2 className="text-lg font-bold text-white">{poll.question}</h2>
+    <div className="rounded-2xl border-2 border-mustard bg-surface p-6">
+      <h2 className="font-display text-lg tracking-wide text-mustard">{poll.question}</h2>
 
       <div className="mt-4 flex flex-col gap-3">
         {poll.options.map((option) => {
@@ -22,17 +22,17 @@ export function PollCard({
 
           if (hasVoted) {
             return (
-              <div key={option.id} className="relative overflow-hidden rounded-lg bg-neutral-800">
+              <div key={option.id} className="relative overflow-hidden rounded-lg bg-surface-deep">
                 <div
-                  className="absolute inset-y-0 left-0 bg-orange-600/40"
+                  className="absolute inset-y-0 left-0 bg-marquee-red/50"
                   style={{ width: `${pct}%` }}
                 />
                 <div className="relative flex items-center justify-between gap-4 px-4 py-2.5 text-sm">
-                  <span className={isPick ? "font-semibold text-white" : "text-neutral-200"}>
+                  <span className={isPick ? "font-semibold text-foreground" : "text-foreground/80"}>
                     {option.label}
                     {isPick ? " (your vote)" : ""}
                   </span>
-                  <span className="shrink-0 text-neutral-400">
+                  <span className="shrink-0 text-foreground/60">
                     {pct}% &middot; {count}
                   </span>
                 </div>
@@ -45,7 +45,7 @@ export function PollCard({
             <form key={option.id} action={voteWithArgs}>
               <button
                 type="submit"
-                className="w-full rounded-lg bg-neutral-800 px-4 py-2.5 text-left text-sm text-neutral-100 transition-colors hover:bg-orange-600/30"
+                className="w-full rounded-lg bg-surface-deep px-4 py-2.5 text-left text-sm text-foreground/90 transition-colors hover:bg-marquee-red/30"
               >
                 {option.label}
               </button>
@@ -54,7 +54,7 @@ export function PollCard({
         })}
       </div>
 
-      <p className="mt-3 text-xs text-neutral-500">
+      <p className="mt-3 text-xs text-foreground/50">
         {poll.total} vote{poll.total === 1 ? "" : "s"}
       </p>
     </div>
